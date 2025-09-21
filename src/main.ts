@@ -11,7 +11,13 @@ async function bootstrap() {
 
   const version = String(process.env.npm_package_version);
 
-  const config = new DocumentBuilder().setVersion(version).build();
+  const config = new DocumentBuilder()
+    .setVersion(version)
+    .setTitle('AI Daily Speech Maker')
+    .setDescription(
+      'Know exactly what you did at given day and what to say at daily meetings',
+    )
+    .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
 
@@ -21,8 +27,6 @@ async function bootstrap() {
     customCss: theme.getBuffer(SwaggerThemeNameEnum.MATERIAL),
   };
   SwaggerModule.setup('api', app, documentFactory, options);
-
-  SwaggerModule.setup('api', app, documentFactory);
 
   await app.listen(process.env.PORT ?? 3000);
 }
