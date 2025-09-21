@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { version } from '../package.json';
+import { HealthCheckResponseDto } from './dto/health-check.dto';
 
 @Injectable()
 export class HealthCheckService {
-  getHello(): any {
+  getHealthCheck(): HealthCheckResponseDto {
     return {
       healthy: true,
       timestamp: new Date().toISOString(),
       message: 'Service is running smoothly',
-      version: version,
+      version: 'version',
     };
   }
 }
