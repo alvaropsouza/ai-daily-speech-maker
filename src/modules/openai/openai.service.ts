@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 
 @Injectable()
-export class AiService {
+export class OpenAiService {
   private client: OpenAI;
 
   constructor(private configService: ConfigService) {
