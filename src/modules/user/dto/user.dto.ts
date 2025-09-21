@@ -1,11 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Speech } from 'generated/prisma';
+import { Speech } from '@prisma/client';
+import { IsEmail } from 'class-validator';
 
 export class UserDto {
   @ApiProperty()
   id?: string;
 
   @ApiProperty()
+  @IsEmail()
   email: string;
 
   @ApiProperty()

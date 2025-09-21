@@ -18,12 +18,9 @@ export class UserRepository {
     return user;
   }
 
-  async findUser(request: Prisma.UserWhereInput): Promise<User | null> {
-    const user = await this.prisma.user.findFirst({
-      where: {
-        email: request.email,
-        name: request.name,
-      },
+  async findUser(request: { email: string }): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: request.email },
     });
 
     return user;
