@@ -6,5 +6,8 @@ export class GetUserActivitiesResponseDto {
   activities: Activity[];
 
   @ApiProperty()
+  summary: string;
+
+  @ApiProperty()
   email: string;
 }

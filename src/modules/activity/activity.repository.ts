@@ -35,6 +35,7 @@ export class ActivityRepository {
       },
       orderBy: { created_at: 'desc' },
     });
+
     return activities;
   }
 }

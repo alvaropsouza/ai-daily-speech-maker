@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Speech } from '@prisma/client';
 import { IsEmail } from 'class-validator';
 
 export class UserDto {
@@ -12,9 +11,6 @@ export class UserDto {
 
   @ApiProperty()
   name: string;
-
-  @ApiProperty()
-  speeches?: Speech[];
 
   @ApiProperty()
   created_at?: Date;

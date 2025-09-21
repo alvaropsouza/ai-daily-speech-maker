@@ -4,12 +4,11 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
-  Query,
 } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
-import { FindUserRequestDto } from './dto/find-user.request.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Users')
@@ -24,13 +23,12 @@ export class UserController {
     return user;
   }
 
-  @Get()
+  @Get(':email')
   @HttpCode(HttpStatus.OK)
   @HttpCode(HttpStatus.NOT_FOUND)
-  async findUser(
-    @Query() request: FindUserRequestDto,
-  ): Promise<UserDto | null> {
-    const user = await this.userService.getUser(request);
+  async findUserById(@Param('email') email: string): Promise<UserDto | null> {
+    const user = await this.userService.getUser({ email });
+
     return user;
   }
 }

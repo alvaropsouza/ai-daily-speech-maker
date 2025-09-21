@@ -8,10 +8,15 @@ import { Activity } from '@prisma/client';
 import { CreateActivityRequestDto } from './dto/create-activity.request.dto';
 import { GetUserActivitiesRequestDto } from './dto/get-user-activities.request.dto';
 import { GetUserActivitiesResponseDto } from './dto/user-activities.response.dto';
+import { AiService } from '../openai/openai.service';
+import { activitiesPrompt } from 'src/modules/openai/prompts/activities.prompt';
 
 @Injectable()
 export class ActivityService {
-  constructor(private activityRepository: ActivityRepository) {}
+  constructor(
+    private activityRepository: ActivityRepository,
+    private aiService: AiService,
+  ) {}
 
   async createActivity(request: CreateActivityRequestDto): Promise<Activity> {
     const { endOfDay, startOfDay } = this.getDayRange();
@@ -55,9 +60,16 @@ export class ActivityService {
     });
 
     if (!activities.length) {
-      throw new NotFoundException(`No activities found for user ${email}`);
+      throw new NotFoundException(
+        `No activities found for user ${email} at ${date}`,
+      );
     }
-    return { email, activities };
+
+    const activitiesSummary = await this.aiService.chat([
+      activitiesPrompt(activities).getActivitiesSummaryPrompt,
+    ]);
+
+    return { email, summary: activitiesSummary, activities };
   }
 
   getDayRange(date?: string): { startOfDay: Date; endOfDay: Date } {
