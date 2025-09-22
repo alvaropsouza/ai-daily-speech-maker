@@ -6,7 +6,7 @@ import OpenAI from 'openai';
 export class OpenAiService {
   private client: OpenAI;
 
-  constructor(private configService: ConfigService) {
+  constructor(private readonly configService: ConfigService) {
     this.client = new OpenAI({
       apiKey: this.configService.get<string>('openApiKey'),
     });
@@ -14,12 +14,13 @@ export class OpenAiService {
 
   async chat(
     messages: { role: 'system' | 'user' | 'assistant'; content: string }[],
-  ) {
+  ): Promise<string> {
     const res = await this.client.chat.completions.create({
       model: 'gpt-4o-mini',
       messages,
       temperature: 0.3,
     });
-    return res.choices[0]?.message?.content ?? '';
+
+    return res?.choices?.[0]?.message?.content ?? '';
   }
 }

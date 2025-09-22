@@ -7,7 +7,20 @@ export default {
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
-  collectCoverageFrom: ['**/*.ts', '!dist/**', '!src/**/*.dto.ts'],
-  coverageDirectory: '../coverage',
+  collectCoverage: true,
+  collectCoverageFrom: [
+    '**/*.ts',
+    '!dist/**',
+    '!src/**/*.dto.ts',
+    '!src/**/*.module.ts',
+    '!src/**/main.ts',
+    '!src/**/index.ts',
+    '!src/**/envs.config.ts',
+    '!test/**',
+    '!**/node_modules/**',
+  ],
+  coverageDirectory: './coverage',
   testEnvironment: 'node',
+  coverageReporters: ['text', 'lcov'],
+  coverageProvider: 'v8',
 };

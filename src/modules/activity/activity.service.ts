@@ -4,12 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ActivityRepository } from './activity.repository';
-import { Activity } from '@prisma/client';
 import { CreateActivityRequestDto } from './dto/create-activity.request.dto';
 import { GetUserActivitiesRequestDto } from './dto/get-user-activities.request.dto';
 import { GetUserActivitiesResponseDto } from './dto/user-activities.response.dto';
 import { OpenAiService } from '../openai/openai.service';
-import { activitiesPrompt } from 'src/modules/openai/prompts/activities.prompt';
+import { activitiesPrompt } from '../../modules/openai/prompts/activities.prompt';
+import { ActivityDto } from './dto/activity.dto';
 
 @Injectable()
 export class ActivityService {
@@ -18,7 +18,9 @@ export class ActivityService {
     private aiService: OpenAiService,
   ) {}
 
-  async createActivity(request: CreateActivityRequestDto): Promise<Activity> {
+  async createActivity(
+    request: CreateActivityRequestDto,
+  ): Promise<ActivityDto> {
     const { endOfDay, startOfDay } = this.getDayRange();
 
     const todayUserActivities =
