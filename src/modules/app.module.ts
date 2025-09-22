@@ -4,7 +4,7 @@ import {
   UserModule,
   HealthCheckModule,
   OpenAiModule,
-} from './modules';
+} from '../modules';
 
 @Module({
   imports: [ActivityModule, HealthCheckModule, OpenAiModule, UserModule],

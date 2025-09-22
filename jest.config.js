@@ -3,6 +3,7 @@
 export default {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: './',
+  coverageProvider: 'v8',
   testRegex: '.*\\.spec\\.ts$',
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
@@ -22,5 +23,4 @@ export default {
   coverageDirectory: './coverage',
   testEnvironment: 'node',
   coverageReporters: ['text', 'lcov'],
-  coverageProvider: 'v8',
 };
