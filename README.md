@@ -1,98 +1,188 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <img src="https://nestjs.com/img/logo-small.svg" width="100" />
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# AI Daily Speech Maker
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+<!-- Badges -->
+<p align="center">
+  <img alt="Node" src="https://img.shields.io/badge/Node-20.x-339933?logo=node.js&logoColor=white" />
+  <img alt="NestJS" src="https://img.shields.io/badge/NestJS-11-red?logo=nestjs" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white" />
+  <img alt="Prisma" src="https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma" />
+  <img alt="License" src="https://img.shields.io/badge/License-UNLICENSED-lightgray" />
 </p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+Automatically generates a concise daily stand-up speech for development teams using recorded activities and OpenAI.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Table of Contents
 
-## Project setup
+- [Overview 🔍](#overview)
+- [Key Features ✨](#key-features)
+- [Tech Stack 🧱](#tech-stack)
+- [Folder Structure 📂](#folder-structure-partial)
+- [Speech Generation Flow 🔄](#speech-generation-flow)
+- [Prompts & OpenAI 🧠](#prompts--openai)
+- [Environment Configuration ⚙️](#environment-configuration)
+- [Scripts 🛠️](#scripts)
+- [Tests & Coverage ✅](#tests--coverage)
+- [Code Quality 🧼](#code-quality)
+- [Conventions 📏](#conventions)
+- [Roadmap 🗺️](#roadmap)
+- [Security 🔐](#security)
+- [Troubleshooting 🩺](#troubleshooting)
+- [License 📄](#license)
+- [Author 👤](#author)
 
-```bash
-$ pnpm install
+## Overview
+
+The application gathers the day's activities (via Prisma) and builds a structured prompt for the OpenAI API to generate a short and objective summary, including whether there were impediments.
+
+## Key Features
+
+- Activity recording and retrieval
+- Prompt generation in Portuguese (can be extended)
+- Impediment identification string: "sem impedimentos" / "com impedimentos"
+- Modular NestJS architecture
+- Full TypeScript typings
+- Unit + e2e tests (Jest)
+- Prisma ORM with versioned migrations
+
+## Tech Stack
+
+NestJS, TypeScript, Prisma, PostgreSQL (Docker), OpenAI SDK, Jest, Supertest, ESLint, Prettier.
+
+## Folder Structure (partial)
+
+```
+src/
+  main.ts
+  app.module.ts
+  config/
+    envs.config.ts
+  modules/
+    openai/
+      prompts/
+        activities.prompt.ts
+    activity/
+    user/
+prisma/
+  schema.prisma
+  migrations/
+test/
+  app.e2e-spec.ts
 ```
 
-## Compile and run the project
+## Speech Generation Flow
 
-```bash
+1. User registers activities.
+2. Backend fetches activities for the current day.
+3. activitiesPrompt serializes them and injects instructions (objective tone + impediment tag).
+4. Prompt sent to OpenAI model.
+5. Model returns speech text for stand-up.
+
+## Prompts & OpenAI
+
+Key file:
+`src/modules/openai/prompts/activities.prompt.ts`
+Generates:
+
+- role: system
+- Portuguese instructions
+- Activities serialized via JSON.stringify
+  Enforces a final tag: "sem impedimentos" or "com impedimentos".
+
+## Environment Configuration
+
+Create a `.env` from `.env.example` (if present):
+
+```
+OPENAI_API_KEY=sk-...
+DATABASE_URL=postgresql://user:pass@localhost:5432/ai_daily
+NODE_ENV=development
+PORT=3000
+```
+
+Align with `envs.config.ts`.
+
+## Installation
+
+```
+pnpm install
+pnpm run migrate
+```
+
+## Run
+
+```
 # development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+pnpm run start:dev
+# build
+pnpm run build
+# production
+pnpm run start:prod
 ```
 
-## Run tests
+## Scripts
 
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+```
+pnpm run test       # unit
+pnpm run test:e2e   # e2e
+pnpm run test:cov   # coverage
+pnpm run lint       # lint + fix
+pnpm run migrate    # prisma migrate dev + db push
 ```
 
-## Deployment
+## Tests & Coverage
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- Jest for unit and e2e
+- Coverage output in /coverage (HTML + lcov)
+  Guidelines:
+- File names: \*.spec.ts
+- Avoid real network in unit tests
+- Mock OpenAI interactions
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Code Quality
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
+- ESLint + Prettier integrated
+- Recommended CI steps: lint, test, test:cov (enforce threshold)
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Conventions
 
-## Resources
+- Strict TypeScript
+- Module folders lowercase (activity, openai)
+- Standard NestJS layering (controllers, services)
+- Suggested commit prefixes: feat / fix / chore / test / refactor / docs
 
-Check out a few resources that may come in handy when working with NestJS:
+## Roadmap
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- [ ] Endpoint to directly generate speech
+- [ ] Response caching per user/day
+- [ ] Adjustable tone (formal/informal)
+- [ ] Multi-language support
+- [ ] Simple UI dashboard
 
-## Support
+## Security
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- Do not log OPENAI_API_KEY
+- Validate inputs (class-validator)
+- Limit payload size (reduce prompt injection surface)
 
-## Stay in touch
+## Troubleshooting
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+| Issue             | Action                           |
+| ----------------- | -------------------------------- |
+| Migration fails   | Check DATABASE_URL               |
+| OpenAI 401        | Verify OPENAI_API_KEY            |
+| Hanging e2e tests | Ensure Prisma connections closed |
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+UNLICENSED (adjust if needed).
+
+## Author
+
+Álvaro Souza
+
+<hr />
+<p align="center">Made with ⚡ + NestJS + OpenAI</p>
