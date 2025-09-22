@@ -7,26 +7,45 @@ import { User } from '@prisma/client';
 import { UserDto } from './dto/user.dto';
 import { UserRepository } from './user.repository';
 import { FindUserRequestDto } from './dto/find-user.request.dto';
+import { Logger } from '../../config/logger/logger.config';
 
 @Injectable()
 export class UserService {
+  private logger: Logger = new Logger(UserService.name);
+
   constructor(private userRepository: UserRepository) {}
 
   async createUser(request: UserDto): Promise<User> {
-    const userExists = await this.userRepository.findUser({
-      email: request.email,
-    });
+    try {
+      this.logger.log(`Creating user with email: ${request.email}`);
 
-    if (userExists) {
-      throw new UnprocessableEntityException('User already exists');
+      const userExists = await this.userRepository.findUser({
+        email: request.email,
+      });
+
+      if (userExists) {
+        this.logger.warn(`User with email ${request.email} already exists`);
+        throw new UnprocessableEntityException('User already exists');
+      }
+
+      this.logger.log(
+        `User with email ${request.email} does not exist, creating`,
+      );
+
+      const user = await this.userRepository.createUser({
+        email: request.email,
+        name: request.name,
+      });
+
+      this.logger.log(`User with email ${request.email} created successfully`);
+
+      return user;
+    } catch (error) {
+      this.logger.error(
+        `Error creating user with email ${request.email}: ${error}`,
+      );
+      throw error;
     }
-
-    const user = await this.userRepository.createUser({
-      email: request.email,
-      name: request.name,
-    });
-
-    return user;
   }
 
   async getUser(request: FindUserRequestDto): Promise<User | null> {

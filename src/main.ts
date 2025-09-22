@@ -13,7 +13,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setVersion(version)
-    .setTitle('AI Daily Speech Maker')
+    .setTitle('OpenAi Daily Speech Maker')
     .setDescription(
       'Know exactly what you did at given day and what to say at daily meetings',
     )

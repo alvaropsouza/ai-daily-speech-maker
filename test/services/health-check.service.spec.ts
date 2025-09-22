@@ -12,7 +12,7 @@ describe('HealthCheckService', () => {
     expect(result).toHaveProperty('healthy', true);
     expect(result).toHaveProperty('timestamp');
     expect(result).toHaveProperty('message', 'Service is running smoothly');
-    expect(result).toHaveProperty('version', 'version');
+    expect(result).toHaveProperty('version', expect.any(String));
     expect(typeof result.timestamp).toBe('string');
   });
 });

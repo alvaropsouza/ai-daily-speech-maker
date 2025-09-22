@@ -5,8 +5,15 @@ import {
   HealthCheckModule,
   OpenAiModule,
 } from '../modules';
+import { LoggerModule } from 'src/config/logger/logger.module';
 
 @Module({
-  imports: [ActivityModule, HealthCheckModule, OpenAiModule, UserModule],
+  imports: [
+    ActivityModule,
+    HealthCheckModule,
+    OpenAiModule,
+    UserModule,
+    LoggerModule,
+  ],
 })
 export class AppModule {}
