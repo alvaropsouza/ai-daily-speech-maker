@@ -24,7 +24,6 @@ export class UserService {
       });
 
       if (userExists) {
-        this.logger.warn(`User with email ${request.email} already exists`);
         throw new UnprocessableEntityException('User already exists');
       }
 
@@ -49,9 +48,23 @@ export class UserService {
   }
 
   async getUser(request: FindUserRequestDto): Promise<User | null> {
-    const user = await this.userRepository.findUser(request);
-    if (!user) throw new NotFoundException('User not found');
+    try {
+      this.logger.log(`Finding user with criteria: ${JSON.stringify(request)}`);
 
-    return user;
+      const user = await this.userRepository.findUser(request);
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      this.logger.log(`User found: ${JSON.stringify(user)}`);
+
+      return user;
+    } catch (error) {
+      this.logger.error(
+        `Error finding user with criteria ${JSON.stringify(request)}: ${error}`,
+      );
+      throw error;
+    }
   }
 }

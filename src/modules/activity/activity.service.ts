@@ -10,9 +10,12 @@ import { GetUserActivitiesResponseDto } from './dto/user-activities.response.dto
 import { OpenAiService } from '../openai/openai.service';
 import { activitiesPrompt } from '../../modules/openai/prompts/activities.prompt';
 import { ActivityDto } from './dto/activity.dto';
+import { Logger } from '../../config/logger/logger.config';
 
 @Injectable()
 export class ActivityService {
+  private logger: Logger = new Logger(ActivityService.name);
+
   constructor(
     private activityRepository: ActivityRepository,
     private aiService: OpenAiService,
@@ -21,6 +24,8 @@ export class ActivityService {
   async createActivity(
     request: CreateActivityRequestDto,
   ): Promise<ActivityDto> {
+    this.logger.log(`Creating activity for user: ${request.email}`);
+
     const { endOfDay, startOfDay } = this.getDayRange();
 
     const todayUserActivities =
@@ -32,11 +37,18 @@ export class ActivityService {
         email: request.email,
       });
 
+    this.logger.log(
+      `Found ${todayUserActivities.length} activities for user ${request.email} today`,
+    );
+
     const activityExists = todayUserActivities
       .map((activity) => activity.content)
       .includes(request.content);
 
     if (activityExists) {
+      this.logger.warn(
+        `Activity "${request.content}" already exists for user ${request.email} today`,
+      );
       throw new BadRequestException('Activity already exists for today');
     }
 
@@ -45,6 +57,10 @@ export class ActivityService {
       User: { connect: { email: request.email } },
     });
 
+    this.logger.log(
+      `Inserted new activity "${request.content}" for user ${request.email}`,
+    );
+
     return activity;
   }
 
@@ -52,6 +68,10 @@ export class ActivityService {
     email,
     date,
   }: GetUserActivitiesRequestDto): Promise<GetUserActivitiesResponseDto> {
+    this.logger.log(
+      `Fetching activities for user: ${email} on date: ${date ?? 'today'}`,
+    );
+
     const { endOfDay, startOfDay } = this.getDayRange(date);
     const activities = await this.activityRepository.findUserActivitiesByDate({
       date: {
@@ -62,6 +82,9 @@ export class ActivityService {
     });
 
     if (!activities.length) {
+      this.logger.warn(
+        `No activities found for user ${email} at ${date ?? 'today'}`,
+      );
       throw new NotFoundException(
         `No activities found for user ${email} at ${date}`,
       );
@@ -70,6 +93,10 @@ export class ActivityService {
     const activitiesSummary = await this.aiService.chat([
       activitiesPrompt(activities).getActivitiesSummaryPrompt,
     ]);
+
+    this.logger.log(
+      `Generated summary for user ${email} on date ${date ?? 'today'}`,
+    );
 
     return { email, summary: activitiesSummary, activities };
   }

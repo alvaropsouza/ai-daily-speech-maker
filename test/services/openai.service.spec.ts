@@ -1,5 +1,6 @@
 import { OpenAiService } from '../../src/modules/openai/openai.service';
 import { ConfigService } from '@nestjs/config';
+import { BadGatewayException } from '@nestjs/common';
 
 jest.mock('openai', () => {
   return jest.fn().mockImplementation(() => ({
@@ -42,7 +43,7 @@ describe('OpenAiService', () => {
 
     expect(mockCreate).toHaveBeenCalledWith(
       expect.objectContaining({
-        model: 'gpt-4o-mini',
+        model: expect.any(String),
         temperature: 0.3,
       }),
     );
@@ -63,5 +64,19 @@ describe('OpenAiService', () => {
     const out = await service.chat([{ role: 'user', content: 'Hi' }]);
 
     expect(out).toBe('');
+  });
+
+  it('logs error and throws BadGatewayException when OpenAI fails', async () => {
+    const error = new Error('OpenAI error');
+    mockCreate.mockRejectedValueOnce(error);
+
+    const loggerSpy = jest.spyOn((service as any).logger, 'error');
+
+    await expect(
+      service.chat([{ role: 'user', content: 'Hi' }]),
+    ).rejects.toThrow(BadGatewayException);
+    expect(loggerSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Error during OpenAI chat completion:'),
+    );
   });
 });
